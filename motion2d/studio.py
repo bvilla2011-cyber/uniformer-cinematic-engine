@@ -144,7 +144,10 @@ def frame(scene,t,total,width,index,count):
         c.text((270,763),'TU PRÓXIMA JUGADA',19,'#203448',True)
     else:
         c.ellipse((137,300+dy,403,566+dy),'#354E6C')
-        c.text((270,434+dy),'U',145,'#F0C576',True)
+        logo = Image.open(ROOT / 'assets' / 'official_logo.png').convert('RGBA')
+        logo = logo.crop(logo.getbbox())
+        logo.thumbnail((int(270*c.s), int(240*c.s)), Image.Resampling.LANCZOS)
+        c.im.paste(logo, (int((c.w-logo.width)/2), int((320+dy)*c.s)), logo)
         c.text((270,610),'UniFormer',42,bold=True)
         for j,line in enumerate(c.wrap(scene.get('cta','El partido empieza contigo.'),25)):
             c.text((270,684+j*33),line,25,'#E9C173',True)
