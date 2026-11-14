@@ -1,0 +1,26 @@
+{
+  "title": "El estadio despierta",
+  "brand": "UNIFORMER STUDIO",
+  "shots": [
+    {
+      "kind": "tunnel",
+      "duration": 2.1,
+      "caption": "TODO EMPIEZA AQUÍ"
+    },
+    {
+      "kind": "pitch",
+      "duration": 3,
+      "caption": "CAMBIA EL PARTIDO"
+    },
+    {
+      "kind": "goal",
+      "duration": 2.5,
+      "caption": "ES TU MOMENTO"
+    },
+    {
+      "kind": "brand",
+      "duration": 2.4,
+      "caption": "SUPER SOCCER"
+    }
+  ]
+}

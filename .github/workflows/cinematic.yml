@@ -1,0 +1,52 @@
+name: UniFormer Cinematic Engine
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements-cinematic.txt
+      - run: python -m pytest -q
+      - name: Render animated video with original audio
+        run: python -m cinematic_engine --quality smoke --story scenes/super_soccer_teaser.json --output dist/smoke.mp4 --poster dist/preview.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uniformer-smoke
+          path: |
+            dist/smoke.mp4
+            dist/preview.png
+          retention-days: 7
+
+  manual-preview:
+    if: github.event_name == 'workflow_dispatch'
+    needs: test-and-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements-cinematic.txt
+      - name: Render social-media-ready preview
+        run: python -m cinematic_engine --quality preview --story scenes/super_soccer_teaser.json --output dist/super_soccer.mp4 --poster dist/poster.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uniformer-preview
+          path: |
+            dist/super_soccer.mp4
+            dist/poster.png
+          retention-days: 7
