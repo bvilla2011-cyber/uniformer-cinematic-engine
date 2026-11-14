@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from PIL import Image, ImageStat
 import io
+import re
 
 from engine.studio import ffprobe
 
@@ -21,6 +22,17 @@ def check(video, minimum_width=540):
         errors.append('Missing or invalid 9:16 video stream')
     if not a:
         errors.append('Missing audio stream')
+    mean_db = None
+    if a:
+        scan = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', str(video),
+            '-vn', '-af', 'volumedetect', '-f', 'null', '-'], capture_output=True, text=True)
+        found = re.search(r'mean_volume:\s*(-?[\d.]+) dB', scan.stderr)
+        if found:
+            mean_db = float(found.group(1))
+            if mean_db < -50:
+                errors.append('Audio appears silent or too quiet')
+        else:
+            errors.append('Unable to measure audio loudness')
     if duration < 1 or duration > 61:
         errors.append('Duration outside allowed range')
     if video.stat().st_size < 20000:
@@ -36,7 +48,7 @@ def check(video, minimum_width=540):
             errors.append(f'Near-black frame at {second:.2f}s')
     return {'passed': not errors, 'errors': errors, 'duration': duration,
         'width': v.get('width') if v else None, 'height': v.get('height') if v else None,
-        'has_audio': bool(a), 'sample_luminance': brightness}
+        'has_audio': bool(a), 'mean_audio_db': mean_db, 'sample_luminance': brightness}
 
 
 def main():
