@@ -13,7 +13,7 @@ blender -b --python renderers/blender_super_soccer.py -- --output output/super_s
 
 The preview is 360×640 at 12 FPS. The production render is 1080×1920 at 24 FPS, with 64 Eevee samples and motion blur. Both are 18 seconds, portrait 9:16, H.264/AAC, and include the original score.
 
-Pass an authorized logo PNG, a recorded voiceover WAV and timed SRT captions when available:
+The authorized UniFormer logo is included at `assets/official_logo.png` and appears by default. Override it with another logo PNG when needed. Add a recorded voiceover WAV and timed SRT captions with:
 
 ```bash
 blender -b --python renderers/blender_super_soccer.py -- \
@@ -23,7 +23,7 @@ blender -b --python renderers/blender_super_soccer.py -- \
   --subtitles projects/super_soccer_launch.srt
 ```
 
-Voice is mixed above the score with automatic music ducking. The renderer does not synthesize a voice; record the original narration below or supply an authorized voice recording. The logo remains optional because no official logo asset is committed here.
+Voice is mixed above the score with automatic music ducking. The renderer does not synthesize a voice; record the original narration below or supply an authorized voice recording. The official logo is used by default and remains replaceable. Captions are burned into the MP4 and also copied as a separate SRT sidecar.
 
 ## Original narration
 
