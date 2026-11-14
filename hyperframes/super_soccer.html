@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1080,height=1920,initial-scale=1" />
+  <title>SUPER SOCCER — El estadio despierta</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    :root { --cyan:#51e6e0; --gold:#f6c26b; --ink:#050b18; --white:#f4f7f4; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--ink); }
+    #root { position:relative; width:1080px; height:1920px; overflow:hidden; color:var(--white); font-family:Arial,Helvetica,sans-serif; background:radial-gradient(ellipse at 50% 42%,#17384a 0,#091728 48%,#030711 100%); }
+    .clip { position:absolute; inset:0; overflow:hidden; }
+    .world { position:absolute; inset:-5%; transform-style:preserve-3d; will-change:transform,opacity; }
+    .grain { position:absolute; inset:0; z-index:80; pointer-events:none; opacity:.16; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E"); mix-blend-mode:soft-light; }
+    .vignette { position:absolute; inset:0; z-index:90; pointer-events:none; background:radial-gradient(ellipse at 50% 44%,transparent 42%,rgba(1,4,13,.7) 100%); }
+    .eyebrow { position:absolute; z-index:30; left:82px; top:111px; color:var(--cyan); font-size:22px; font-weight:700; letter-spacing:.32em; text-transform:uppercase; }
+    .title { position:absolute; z-index:35; left:70px; right:70px; top:165px; margin:0; font-size:70px; line-height:.98; letter-spacing:-.055em; font-weight:900; text-transform:uppercase; text-shadow:0 8px 35px #000b; }
+    .title em { color:var(--gold); font-style:normal; }
+    .sub { position:absolute; z-index:35; left:84px; right:84px; top:340px; color:#d5e2e7; font-size:24px; line-height:1.4; letter-spacing:.08em; }
+    .light-cone { position:absolute; top:0; width:260px; height:1300px; opacity:.16; filter:blur(10px); background:linear-gradient(180deg,rgba(154,245,240,.7),transparent 72%); clip-path:polygon(42% 0,58% 0,100% 100%,0 100%); transform-origin:top; }
+    .tunnel .light-cone.left { left:120px; transform:rotate(-11deg); }
+    .tunnel .light-cone.right { right:120px; transform:rotate(11deg); }
+    .tunnel-wall { position:absolute; top:0; bottom:0; width:45%; background:linear-gradient(120deg,#192f43 0,#0d1b2c 50%,#060d1b 100%); }
+    .tunnel-wall.left { left:-8%; clip-path:polygon(0 0,100% 0,68% 58%,100% 100%,0 100%); }
+    .tunnel-wall.right { right:-8%; clip-path:polygon(0 0,100% 0,100% 100%,0 100%,32% 58%); transform:scaleX(-1); }
+    .tunnel-floor { position:absolute; left:12%; right:12%; bottom:-12%; height:62%; transform:perspective(850px) rotateX(58deg); transform-origin:bottom; background:repeating-linear-gradient(0deg,#0e3745 0 3px,#082332 4px 100px); clip-path:polygon(43% 0,57% 0,100% 100%,0 100%); }
+    .tunnel-rib { position:absolute; left:11%; right:11%; top:22%; height:80%; border:12px solid rgba(81,230,224,.54); border-bottom:0; border-radius:50% 50% 0 0 / 12% 12% 0 0; transform:perspective(900px) rotateX(4deg) scaleY(1.35); box-shadow:0 0 45px #41d7d455,inset 0 0 36px #41d7d422; }
+    .stadium-sky { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 37%,#3e8890 0,#174554 28%,#071323 68%); }
+    .stands { position:absolute; top:30%; left:-15%; width:130%; height:33%; transform:perspective(1000px) rotateX(25deg); background:repeating-linear-gradient(0deg,#143344 0 17px,#285362 18px 21px,#11273a 22px 37px); clip-path:polygon(0 0,100% 0,90% 100%,10% 100%); }
+    .crowd { position:absolute; top:36%; left:7%; width:86%; height:22%; opacity:.9; background:radial-gradient(circle,#f3c977 0 2px,transparent 3px),radial-gradient(circle,#73e1df 0 2px,transparent 3px),radial-gradient(circle,#7da7d4 0 2px,transparent 3px); background-size:25px 23px,31px 27px,37px 31px; background-position:0 0,10px 12px,17px 7px; mask-image:linear-gradient(180deg,#000,transparent 90%); }
+    .pitch { position:absolute; left:-15%; right:-15%; bottom:-15%; height:62%; transform:perspective(700px) rotateX(54deg); transform-origin:bottom; background:repeating-linear-gradient(90deg,#14765f 0 150px,#18836a 151px 300px); box-shadow:0 -35px 100px #35d3a822; }
+    .pitch:before { content:""; position:absolute; inset:6% 14%; border:5px solid #dbf0daaa; }
+    .pitch:after { content:""; position:absolute; width:31%; height:23%; left:34.5%; top:43%; border:5px solid #dbf0daaa; border-radius:50%; }
+    .half-line { position:absolute; left:50%; top:7%; height:86%; border-left:5px solid #dbf0daaa; }
+    .floodlight { position:absolute; z-index:5; top:21%; width:34px; height:390px; border-radius:20px; background:linear-gradient(#e6ffff,#55aab1 36%,#173248); box-shadow:0 0 40px #9ffcff; }
+    .floodlight:after { content:""; position:absolute; left:-74px; top:-13px; width:180px; height:46px; border-radius:50%; background:#e9ffff; box-shadow:0 0 35px 20px #c6ffff,0 0 210px 80px #54dadd77; }
+    .floodlight.left { left:12%; } .floodlight.right { right:12%; }
+    .actor { position:absolute; z-index:20; width:170px; height:380px; filter:drop-shadow(0 26px 18px #02060c99); transform-origin:50% 90%; }
+    .actor svg { width:100%; height:100%; overflow:visible; }
+    .actor .arm,.actor .leg { transform-box:fill-box; }
+    .player-a { left:18%; bottom:18%; }
+    .player-b { right:17%; bottom:23%; transform:scale(.79); }
+    .keeper { left:44%; bottom:17%; transform:scale(1.05); }
+    .ball { position:absolute; z-index:25; left:48%; bottom:24%; width:74px; height:74px; border-radius:50%; background:radial-gradient(circle at 32% 28%,#fff 0 18%,#d8e1df 19% 60%,#45545c 61% 65%,#fff 66%); box-shadow:0 18px 22px #0018; }
+    .ball:before { content:""; position:absolute; inset:20px; background:#1c3942; clip-path:polygon(50% 0,96% 35%,78% 91%,22% 91%,4% 35%); }
+    .goal-frame { position:absolute; z-index:10; left:21%; right:21%; top:31%; height:37%; border:12px solid #effbf2; box-shadow:0 0 35px #b7fff1aa; }
+    .goal-mesh { position:absolute; inset:0; opacity:.28; background:repeating-linear-gradient(0deg,transparent 0 38px,#d6f4eb 40px 42px),repeating-linear-gradient(90deg,transparent 0 48px,#d6f4eb 50px 52px); }
+    .caption { position:absolute; z-index:40; left:85px; right:85px; bottom:195px; text-align:center; color:white; font-size:24px; font-weight:700; letter-spacing:.35em; text-shadow:0 3px 20px #000; }
+    .brand-lockup { position:absolute; z-index:35; left:0; right:0; top:36%; text-align:center; opacity:0; }
+    .brand-lockup .mark { margin:auto auto 38px; width:175px; height:175px; border:4px solid var(--cyan); border-radius:50%; display:grid; place-items:center; color:var(--cyan); font-weight:900; font-size:66px; letter-spacing:-.1em; box-shadow:0 0 75px #51e6e066,inset 0 0 50px #51e6e022; }
+    .brand-lockup h2 { margin:0; font-size:105px; line-height:.86; letter-spacing:-.07em; font-weight:900; }
+    .brand-lockup h2 span { display:block; color:var(--gold); }
+    .brand-lockup p { margin-top:45px; font-size:24px; color:#cde2e6; letter-spacing:.32em; }
+    .scene-copy { position:absolute; z-index:30; left:85px; right:85px; bottom:195px; font-size:26px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; }
+    .scene-copy span { color:var(--cyan); }
+  </style>
+</head>
+<body>
+  <main id="root" data-composition-id="root" data-start="0" data-duration="18" data-width="1080" data-height="1920">
+    <section class="clip tunnel" id="tunnel" data-start="0" data-duration="4.2" data-track-index="0">
+      <div class="world" id="tunnelWorld">
+        <div class="tunnel-wall left"></div><div class="tunnel-wall right"></div>
+        <div class="tunnel-floor"></div><div class="tunnel-rib"></div>
+        <div class="light-cone left"></div><div class="light-cone right"></div>
+        <div class="actor" id="runner" style="left:42%;bottom:18%;transform:scale(.66)">
+          <svg viewBox="0 0 180 390" aria-hidden="true">
+            <ellipse cx="90" cy="370" rx="55" ry="14" fill="#020711" opacity=".7"/>
+            <g class="leg leg-a"><path d="M73 245 58 306 35 346 62 355 97 307 105 256Z" fill="#172d3b"/><path d="M35 346 8 365 12 378 70 374 62 355Z" fill="#f2f4eb"/></g>
+            <g class="leg leg-b"><path d="M104 245 120 300 143 337 121 355 83 310 71 260Z" fill="#0c202e"/><path d="M121 355 151 362 168 376 116 380 104 369Z" fill="#dce7e4"/></g>
+            <path d="m55 96 68-3 24 145-97 14-23-105Z" fill="#0b2536"/><path d="m63 102 51-4 19 109-55 13-24-85Z" fill="#27b8b4"/><path d="m114 98 9-5 24 145-20 3Z" fill="#d4a755"/>
+            <g class="arm"><path d="m55 117-24 54-7 48 19 3 20-47 18-42Z" fill="#d8aa87"/><path d="m24 219-7 18 19 5 10-19Z" fill="#c88f70"/></g>
+            <path d="M80 87 77 65 110 61 115 92Z" fill="#c98f70"/><path d="M68 24 94 5 124 20 131 56 112 82 80 74 64 53Z" fill="#d4a183"/><path d="m63 36 3-22 34-11 29 15-4 25-24-13-21 10Z" fill="#111e29"/>
+          </svg>
+        </div>
+        <div class="scene-copy">El ruido queda atrás <span>·</span> empieza el partido</div>
+      </div>
+    </section>
+    <section class="clip stadium" id="stadium" data-start="3.3" data-duration="5.0" data-track-index="0">
+      <div class="world" id="stadiumWorld">
+        <div class="stadium-sky"></div><div class="stands"></div><div class="crowd"></div>
+        <div class="floodlight left"></div><div class="floodlight right"></div>
+        <div class="pitch"><div class="half-line"></div></div>
+        <h1 class="title" id="stadiumTitle">Cada decisión<br/>puede <em>cambiarlo todo.</em></h1>
+        <div class="sub">UN EQUIPO. UN OBJETIVO. TU FORMA DE JUGARLO.</div>
+        <div class="actor player-a" id="playerA">
+          <svg viewBox="0 0 180 390" aria-hidden="true">
+            <ellipse cx="90" cy="370" rx="55" ry="14" fill="#020711" opacity=".65"/>
+            <g class="leg leg-a"><path d="m72 250-18 60-31 33 20 20 43-41 20-63Z" fill="#122d38"/><path d="m23 343-16 23 15 12 45-18-24-17Z" fill="#edf2ea"/></g>
+            <g class="leg leg-b"><path d="m103 250 18 58 37 25-10 25-52-26-22-65Z" fill="#173a43"/><path d="m148 338 23 11 2 19-50-10-7-14Z" fill="#edf2ea"/></g>
+            <path d="m54 103 76-7 20 144-103 13-17-99Z" fill="#0e2835"/><path d="m64 108 51-5 17 107-59 10-14-76Z" fill="#50dfd0"/><path d="m115 103 15-7 20 144-19 3Z" fill="#299b9a"/>
+            <g class="arm"><path d="m54 120-27 44-12 53 20 8 25-51 18-37Z" fill="#d4a082"/><path d="m15 216-8 18 21 7 10-20Z" fill="#bd8268"/></g>
+            <path d="m80 90-1-23 33-4 5 28Z" fill="#c98e70"/><path d="m66 34 30-25 30 16 7 34-21 29-31-10-19-20Z" fill="#d8a98b"/><path d="m63 43 4-28 35-14 30 19-3 22-25-14-21 12Z" fill="#10202c"/>
+          </svg>
+        </div>
+        <div class="actor player-b" id="playerB">
+          <svg viewBox="0 0 180 390" aria-hidden="true">
+            <ellipse cx="90" cy="370" rx="55" ry="14" fill="#020711" opacity=".65"/>
+            <g class="leg leg-a"><path d="m72 250-18 60-31 33 20 20 43-41 20-63Z" fill="#14273a"/><path d="m23 343-16 23 15 12 45-18-24-17Z" fill="#edf2ea"/></g>
+            <g class="leg leg-b"><path d="m103 250 18 58 37 25-10 25-52-26-22-65Z" fill="#182f42"/><path d="m148 338 23 11 2 19-50-10-7-14Z" fill="#edf2ea"/></g>
+            <path d="m54 103 76-7 20 144-103 13-17-99Z" fill="#172849"/><path d="m64 108 51-5 17 107-59 10-14-76Z" fill="#f2bd68"/><path d="m115 103 15-7 20 144-19 3Z" fill="#d18b4a"/>
+            <g class="arm"><path d="m54 120-27 44-12 53 20 8 25-51 18-37Z" fill="#bd886c"/><path d="m15 216-8 18 21 7 10-20Z" fill="#af735b"/></g>
+            <path d="m80 90-1-23 33-4 5 28Z" fill="#b98164"/><path d="m66 34 30-25 30 16 7 34-21 29-31-10-19-20Z" fill="#c28d72"/><path d="m63 43 4-28 35-14 30 19-3 22-25-14-21 12Z" fill="#1a1d25"/>
+          </svg>
+        </div>
+        <div class="scene-copy">No hay camino fácil <span>·</span> solo el siguiente pase</div>
+      </div>
+    </section>
+    <section class="clip goal" id="goal" data-start="7.8" data-duration="5.0" data-track-index="0">
+      <div class="world" id="goalWorld">
+        <div class="stadium-sky"></div><div class="stands"></div><div class="crowd"></div>
+        <div class="floodlight left"></div><div class="floodlight right"></div>
+        <div class="pitch"></div>
+        <div class="goal-frame"><div class="goal-mesh"></div></div>
+        <div class="actor keeper" id="keeper">
+          <svg viewBox="0 0 180 390" aria-hidden="true">
+            <ellipse cx="90" cy="370" rx="65" ry="14" fill="#020711" opacity=".65"/>
+            <g class="leg leg-a"><path d="m72 250-20 60-23 37 20 18 40-49 22-62Z" fill="#202638"/><path d="m49 347-12 25 16 10 43-29-26-12Z" fill="#f0f1e7"/></g>
+            <g class="leg leg-b"><path d="m104 250 12 57 33 27-8 27-48-29-22-64Z" fill="#282638"/><path d="m141 334 25 8 7 18-51-5-7-14Z" fill="#f0f1e7"/></g>
+            <path d="m54 103 76-7 20 144-103 13-17-99Z" fill="#ad594f"/><path d="m65 107 58-5 19 115-65 10-15-77Z" fill="#e87860"/><path d="m115 103 15-7 20 144-19 3Z" fill="#9c4847"/>
+            <g class="arm"><path d="m54 120-27 44-12 53 20 8 25-51 18-37Z" fill="#c88f73"/><path d="m15 216-8 18 21 7 10-20Z" fill="#ae755d"/></g>
+            <g class="arm"><path d="m130 120 28 44 13 53-20 8-25-51-18-37Z" fill="#c88f73"/><path d="m171 216 8 18-21 7-10-20Z" fill="#ae755d"/></g>
+            <path d="m80 90-1-23 33-4 5 28Z" fill="#c88f73"/><path d="m66 34 30-25 30 16 7 34-21 29-31-10-19-20Z" fill="#d0a184"/><path d="m63 43 4-28 35-14 30 19-3 22-25-14-21 12Z" fill="#18212c"/>
+          </svg>
+        </div>
+        <div class="ball" id="ball"></div>
+        <h1 class="title" id="goalTitle">UN INSTANTE.<br/><em>UNA HISTORIA.</em></h1>
+        <div class="scene-copy">La grada contiene el aliento <span>·</span> ahora</div>
+      </div>
+    </section>
+    <section class="clip outro" id="outro" data-start="12.3" data-duration="5.7" data-track-index="0">
+      <div class="world" id="outroWorld">
+        <div class="stadium-sky"></div><div class="light-cone left" style="left:2%;top:-4%;transform:rotate(-14deg)"></div><div class="light-cone right" style="right:2%;top:-4%;transform:rotate(14deg)"></div>
+        <div class="brand-lockup" id="brand">
+          <div class="mark">UF</div><h2>SUPER<span>SOCCER</span></h2>
+          <p>UNIFORMER STUDIO · EN BETA</p>
+        </div>
+        <div class="caption" id="cta">EL PARTIDO EMPIEZA PRONTO</div>
+      </div>
+    </section>
+    <div class="grain"></div><div class="vignette"></div>
+  </main>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.set(["#tunnel","#stadium","#goal","#outro"], { opacity: 0 });
+    tl.set("#tunnel", { opacity: 1 });
+    tl.fromTo("#tunnelWorld", { scale: 1.2, y: 70 }, { scale: 1, y: 0, duration: 4.2, ease: "power2.out" }, 0);
+    tl.fromTo("#runner", { y: 90, scale: .52, opacity: 0 }, { y: 0, scale: .66, opacity: 1, duration: 1.4, ease: "power3.out" }, .55);
+    tl.to("#runner .leg-a", { rotation: 20, transformOrigin: "50% 0%", duration: .24, repeat: 7, yoyo: true, ease: "sine.inOut" }, .6);
+    tl.to("#runner .leg-b", { rotation: -20, transformOrigin: "50% 0%", duration: .24, repeat: 7, yoyo: true, ease: "sine.inOut" }, .6);
+    tl.to("#runner .arm", { rotation: -18, transformOrigin: "15% 15%", duration: .28, repeat: 6, yoyo: true, ease: "sine.inOut" }, .6);
+    tl.to("#tunnel", { opacity: 0, duration: .55 }, 3.65);
+    tl.set("#stadium", { opacity: 1 }, 3.5);
+    tl.fromTo("#stadiumWorld", { scale: 1.24, y: 130 }, { scale: 1, y: 0, duration: 3.8, ease: "power3.out" }, 3.5);
+    tl.fromTo("#stadiumTitle", { y: 70, opacity: 0 }, { y: 0, opacity: 1, duration: .8, ease: "power3.out" }, 4.1);
+    tl.fromTo("#playerA", { x: -150, rotation: -8 }, { x: 90, rotation: 0, duration: 2.5, ease: "power2.out" }, 5.1);
+    tl.fromTo("#playerB", { x: 170, rotation: 8 }, { x: -55, rotation: 0, duration: 2.2, ease: "power2.out" }, 5.4);
+    tl.to("#playerA .leg-a", { rotation: 25, transformOrigin: "50% 0%", duration: .27, repeat: 4, yoyo: true, ease: "sine.inOut" }, 5.3);
+    tl.to("#playerA .leg-b", { rotation: -24, transformOrigin: "50% 0%", duration: .27, repeat: 4, yoyo: true, ease: "sine.inOut" }, 5.3);
+    tl.to("#stadium", { opacity: 0, duration: .55 }, 7.65);
+    tl.set("#goal", { opacity: 1 }, 7.8);
+    tl.fromTo("#goalWorld", { scale: 1.18, y: 75 }, { scale: 1, y: 0, duration: 3.8, ease: "power2.out" }, 7.8);
+    tl.fromTo("#ball", { x: -470, y: 340, rotation: -30, scale: .42 }, { x: 520, y: -440, rotation: 1080, scale: 1.45, duration: 1.05, ease: "power2.in" }, 10.15);
+    tl.to("#keeper", { x: 240, y: -80, rotation: 62, duration: .78, ease: "power3.in" }, 10.25);
+    tl.fromTo("#goalTitle", { scale: .72, opacity: 0 }, { scale: 1, opacity: 1, duration: .52, ease: "back.out(1.8)" }, 10.9);
+    tl.to("#goal", { opacity: 0, duration: .6 }, 12.2);
+    tl.set("#outro", { opacity: 1 }, 12.35);
+    tl.fromTo("#outroWorld", { scale: 1.08 }, { scale: 1, duration: 2.6, ease: "power2.out" }, 12.35);
+    tl.to("#brand", { opacity: 1, duration: .8, y: -25, ease: "power2.out" }, 13.15);
+    tl.fromTo("#brand .mark", { scale: .7, rotation: -24 }, { scale: 1, rotation: 0, duration: .95, ease: "back.out(1.7)" }, 13.15);
+    tl.fromTo("#cta", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: .55 }, 15.1);
+    tl.to(["#tunnel","#stadium","#goal","#outro"], { opacity: 1, duration: .001 }, 17.99);
+    window.__timelines.root = tl;
+  </script>
+</body>
+</html>
