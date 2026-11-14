@@ -1,0 +1,67 @@
+name: Blender Super Soccer teaser
+
+on:
+  workflow_dispatch:
+    inputs:
+      quality:
+        description: Render quality
+        required: true
+        type: choice
+        options:
+          - preview
+          - production
+        default: preview
+      logo_path:
+        description: Optional path to an authorized PNG logo in the repository
+        required: false
+        type: string
+      voiceover_path:
+        description: Optional path to a recorded WAV voiceover in the repository
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Blender and FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender ffmpeg fonts-dejavu-core
+
+      - name: Render teaser
+        env:
+          QUALITY: ${{ inputs.quality }}
+          LOGO_PATH: ${{ inputs.logo_path }}
+          VOICEOVER_PATH: ${{ inputs.voiceover_path }}
+        run: |
+          mkdir -p output
+          args=(--output output/super_soccer.mp4 --subtitles projects/super_soccer_launch.srt)
+          if [[ "$QUALITY" == "preview" ]]; then
+            args+=(--preview)
+          fi
+          if [[ -n "$LOGO_PATH" ]]; then
+            args+=(--logo "$LOGO_PATH")
+          fi
+          if [[ -n "$VOICEOVER_PATH" ]]; then
+            args+=(--voiceover "$VOICEOVER_PATH")
+          fi
+          blender --background --python renderers/blender_super_soccer.py -- "${args[@]}"
+          ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate -show_entries format=duration -of default=noprint_wrappers=1 output/super_soccer.mp4
+
+      - name: Package video and subtitles
+        uses: actions/upload-artifact@v4
+        with:
+          name: super-soccer-${{ inputs.quality }}
+          path: |
+            output/super_soccer.mp4
+            output/super_soccer.srt
+          if-no-files-found: error
+          retention-days: 30
