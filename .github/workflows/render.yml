@@ -1,0 +1,28 @@
+name: Render UniFormer prototype
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "engine/**"
+      - "requirements.txt"
+      - ".github/workflows/render.yml"
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install -r requirements.txt
+      - run: python engine/render.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uniformer-prototype-mp4
+          path: output/uniformer_teaser.mp4
+          retention-days: 7
