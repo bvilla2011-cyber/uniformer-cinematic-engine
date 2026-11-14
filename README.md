@@ -1,6 +1,18 @@
 # UniFormer Cinematic Engine
 
-Procedural 2.5D animation tools for original UniFormer Studio campaign clips. The repository contains two render paths: the general scene studio under `engine/` and the football teaser renderer under `super_soccer_renderer/`.
+Procedural 2.5D animation tools for original UniFormer Studio campaign clips. The repository contains three production paths: the general scene studio under `engine/`, the football teaser renderer under `super_soccer_renderer/`, and a HyperFrames composition under `hyperframes/`.
+
+## HyperFrames cinematic composition
+
+`hyperframes/super_soccer.html` is an authored 18-second vertical teaser built for HyperFrames: finite, seekable GSAP motion; low-poly-inspired stadium geometry; layered floodlights; articulated player silhouettes; camera pushes; a goal sequence; and a branded end card. It is a separate composition and does not remove the existing Python renderer.
+
+Render it from the repository root with the [HyperFrames CLI](https://github.com/heygen-com/hyperframes):
+
+```bash
+npx hyperframes render --composition hyperframes/super_soccer.html --quality high --fps 30 --output output/super_soccer_hyperframes.mp4
+```
+
+The composition loads GSAP from jsDelivr, so rendering it requires network access. Its timeline uses authored deterministic keyframes rather than live wall-clock motion.
 
 ## Super Soccer teaser renderer
 
