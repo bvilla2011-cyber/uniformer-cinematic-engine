@@ -27,7 +27,7 @@ Voice is mixed above the score with automatic music ducking. The renderer does n
 
 ## Original narration
 
-> Cuando se apagan las luces, empieza el partido. Un equipo. Un estadio. Un sueño que está a un pase de cambiarlo todo. Corre, combina, busca el espacio. Y cuando llega el momento… decide. Super Soccer. El estadio despierta. Ya puedes entrar en beta.
+> Cuando se apagan las luces, empieza el partido. Un equipo. Un estadio. Un sueño: un pase puede cambiarlo todo. Corre, combina, busca el espacio. Y cuando llega el momento… decide. Super Soccer. El estadio despierta. Ya puedes entrar en beta.
 
 The matching SRT is `projects/super_soccer_launch.srt`. The script and captions are original to this project.
 
