@@ -245,12 +245,15 @@ def ring(name, parent, loc, radius, material):
 
 def image_panel(path, parent, loc, height):
     image = bpy.data.images.load(str(path), check_existing=True)
-    aspect = image.size[0] / max(1, image.size[1])
+    # The supplied logo export has substantial transparent margins; sample a
+    # centred mark-and-wordmark crop so it reads at mobile end-card size.
+    u0, u1, v0, v1 = .25, .75, .20, .80
+    aspect = (image.size[0] / max(1, image.size[1])) * (u1-u0) / (v1-v0)
     w = height * aspect
     mesh = bpy.data.meshes.new("Brand logo plane mesh")
     mesh.from_pydata([(-w/2,-height/2,0),(w/2,-height/2,0),(w/2,height/2,0),(-w/2,height/2,0)],[],[(0,1,2,3)])
     uv = mesh.uv_layers.new(name="Logo UV")
-    for loop, coord in zip(mesh.loops, ((0,0),(1,0),(1,1),(0,1))):
+    for loop, coord in zip(mesh.loops, ((u0,v0),(u1,v0),(u1,v1),(u0,v1))):
         uv.data[loop.index].uv = coord
     material = bpy.data.materials.new("Official RGBA brand logo")
     material.use_nodes = True
@@ -492,13 +495,13 @@ def build_scene(logo=None):
     logo_text = text_obj("UNIFORMER STUDIO", "Brand eyebrow", ui_cyan, .15, cam, (0,.63,-3.42))
     title1 = text_obj("SUPER", "End card SUPER", ui_white, .40, cam, (0,.12,-3.42), .009)
     title2 = text_obj("SOCCER", "End card SOCCER", ui_gold, .37, cam, (0,-.34,-3.42), .009)
-    tagline = text_obj("EL ESTADIO DESPIERTA  ·  EN BETA", "End card tagline", ui_white, .105, cam, (0,-.78,-3.42))
-    for o in (logo_text,title1,title2,tagline):
+    # Keep the lower safe area open for the burned-in mobile captions.
+    for o in (logo_text,title1,title2):
         for f, s in ((1,(.001,.001,.001)),(337,(.001,.001,.001)),(356,(1,1,1)),(432,(1,1,1))): animate(o,f,scale=s)
     if logo and Path(logo).is_file():
         for f in (1,337,356,432):
             animate(logo_text,f,scale=(.001,.001,.001))
-        official_logo = image_panel(logo,cam,(0,1.02,-3.40),.68)
+        official_logo = image_panel(logo,cam,(0,1.02,-3.40),.76)
         for f, s in ((1,(.001,.001,.001)),(337,(.001,.001,.001)),(356,(1,1,1)),(432,(1,1,1))):
             animate(official_logo,f,scale=s)
     # Keep the title lockup clear; decorative ring crossed the tagline in portrait framing.
@@ -600,7 +603,10 @@ def main():
             ffmpeg += ["-map","0:v:0","-map","1:a:0"]
         if subtitles:
             subtitle_path = str(subtitles).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
-            style = "FontName=DejaVu Sans,Bold=1,FontSize=48,PrimaryColour=&H00FFFFFF,OutlineColour=&H99081020,BorderStyle=1,Outline=4,Shadow=1,Alignment=2,MarginV=84"
+            font_size = 18 if opt.preview else 54
+            outline = 2 if opt.preview else 6
+            margin = 34 if opt.preview else 102
+            style = f"FontName=DejaVu Sans,Bold=1,FontSize={font_size},PrimaryColour=&H00FFFFFF,OutlineColour=&H99081020,BorderStyle=1,Outline={outline},Shadow=1,Alignment=2,MarginV={margin}"
             ffmpeg += ["-vf", f"subtitles='{subtitle_path}':force_style='{style}'"]
         ffmpeg += ["-c:v","libx264","-preset","slow" if not opt.preview else "veryfast","-crf","16" if not opt.preview else "25","-pix_fmt","yuv420p","-r",str(fps),"-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(out)]
         subprocess.run(ffmpeg,check=True)
