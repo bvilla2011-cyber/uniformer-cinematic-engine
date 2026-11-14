@@ -1,0 +1,15 @@
+{
+  "title": "FIRST LIGHT | UniFormer Studio",
+  "slug": "first-light",
+  "cover_at": 7.4,
+  "shots": [
+    {"type": "rooftop", "duration": 3.2, "headline": "A SPARK", "subtitle": "IS ALL IT TAKES"},
+    {"type": "forge", "duration": 3.1, "headline": "BUILD THE IMPOSSIBLE", "subtitle": "FRAME BY FRAME"},
+    {"type": "reveal", "duration": 3.7, "headline": "UNIFORMER", "subtitle": "STUDIO · ORIGINAL WORLDS"}
+  ],
+  "social": {
+    "caption": "Every world begins somewhere. Welcome to UniFormer Studio. Original worlds. Infinite stories.",
+    "hashtags": ["UniFormerStudio", "IndieGames", "GameDevelopment", "Animation"],
+    "platforms": ["instagram", "tiktok", "youtube"]
+  }
+}
