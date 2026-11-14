@@ -603,9 +603,9 @@ def main():
             ffmpeg += ["-map","0:v:0","-map","1:a:0"]
         if subtitles:
             subtitle_path = str(subtitles).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
-            font_size = 18 if opt.preview else 54
-            outline = 2 if opt.preview else 6
-            margin = 34 if opt.preview else 102
+            font_size = 14 if opt.preview else 42
+            outline = 1.5 if opt.preview else 4.5
+            margin = 30 if opt.preview else 90
             style = f"FontName=DejaVu Sans,Bold=1,FontSize={font_size},PrimaryColour=&H00FFFFFF,OutlineColour=&H99081020,BorderStyle=1,Outline={outline},Shadow=1,Alignment=2,MarginV={margin}"
             ffmpeg += ["-vf", f"subtitles='{subtitle_path}':force_style='{style}'"]
         ffmpeg += ["-c:v","libx264","-preset","slow" if not opt.preview else "veryfast","-crf","16" if not opt.preview else "25","-pix_fmt","yuv420p","-r",str(fps),"-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(out)]
