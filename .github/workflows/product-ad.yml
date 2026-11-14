@@ -25,11 +25,12 @@ jobs:
       - run: npm install --no-save @napi-rs/canvas
       - run: node motion2d/capture_game.cjs game-source output/gameframes
       - run: ffmpeg -v error -y -framerate 30 -i output/gameframes/%05d.png -c:v libx264 -crf 18 -pix_fmt yuv420p output/gameplay.mp4
-      - run: python motion2d/product_ad.py --gameplay output/gameplay.mp4 --logo assets/official_logo.png --output output/super_soccer_ad.mp4
+      - run: python motion2d/product_ad_v2.py --gameplay output/gameplay.mp4 --logo assets/official_logo.png --output output/super_soccer_ad.mp4
       - uses: actions/upload-artifact@v4
         with:
           name: super-soccer-product-ad
           path: |
             output/super_soccer_ad.mp4
             output/gameframes/capture.json
+            output/super_soccer_ad.timing.json
           if-no-files-found: error
