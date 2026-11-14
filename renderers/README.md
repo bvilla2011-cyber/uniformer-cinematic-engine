@@ -11,7 +11,7 @@ blender -b --python renderers/blender_super_soccer.py -- --preview --output outp
 blender -b --python renderers/blender_super_soccer.py -- --output output/super_soccer_1080.mp4
 ```
 
-The preview is 360×640 at 12 FPS. The production render is 1080×1920 at 24 FPS, with 64 Eevee samples and motion blur. Both are 18 seconds, portrait 9:16, H.264/AAC, and include the original score.
+The preview is 360×640 at 12 FPS. The production render is 1080×1920 at 24 FPS, with 8 Eevee samples and motion blur. Both are 18 seconds, portrait 9:16, H.264/AAC, and include the original score.
 
 The authorized UniFormer logo is included at `assets/official_logo.png` and appears by default. Override it with another logo PNG when needed. Add a recorded voiceover WAV and timed SRT captions with:
 
