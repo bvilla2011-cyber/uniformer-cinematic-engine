@@ -52,5 +52,25 @@ class TestBrief(unittest.TestCase):
             generate('An original ad',endpoint='http://example.com/v1/chat/completions',model='test')
 
 
+
+class TestCaptions(unittest.TestCase):
+    def test_timed_caption_and_logo(self):
+        from PIL import Image
+        from tempfile import TemporaryDirectory
+        data = json.loads(PROJECT.read_text(encoding='utf-8'))
+        data['captions'] = [{'start': 1.0, 'end': 2.0, 'text': 'THE NEXT WORLD'}]
+        with TemporaryDirectory() as folder:
+            path = Path(folder) / 'brand.png'
+            Image.new('RGBA', (50, 30), (250, 250, 250, 200)).save(path)
+            engine = Studio(data,270,480,logo_path=path)
+            self.assertNotEqual(engine.render_at(1.5).tobytes(), engine.render_at(2.1).tobytes())
+            self.assertEqual(engine.render_at(8.0).size, (270,480))
+
+    def test_reject_caption_outside_duration(self):
+        data = json.loads(PROJECT.read_text(encoding='utf-8'))
+        data['captions'] = [{'start': 11, 'end': 12, 'text': 'Invalid'}]
+        with self.assertRaises(ValueError):
+            validate_project(data)
+
 if __name__=='__main__':
     unittest.main()
