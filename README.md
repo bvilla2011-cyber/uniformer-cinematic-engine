@@ -14,7 +14,7 @@ npx hyperframes render --composition hyperframes/super_soccer.html --quality hig
 
 The composition loads GSAP from jsDelivr, so rendering it requires network access. Its timeline uses authored deterministic keyframes rather than live wall-clock motion.
 
-To render from GitHub Actions, open [the HyperFrames workflow](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/hyperframes.yml), choose **Run workflow**, select **high**, and download the resulting MP4 artifact when the run completes.
+After this branch is merged into `main`, open [the HyperFrames workflow](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/hyperframes.yml), choose **Run workflow**, select **high**, and download the resulting MP4 artifact when the run completes.
 
 ## Super Soccer teaser renderer
 
