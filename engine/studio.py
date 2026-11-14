@@ -341,30 +341,68 @@ class Studio:
 
 
 def synthesize_audio(seconds, shots, dest, sr=24000):
-    """Original synthesized music and sound cues, not copyrighted samples."""
-    n=int(seconds*sr)
-    t=np.arange(n,dtype=np.float64)/sr
-    mix=np.zeros(n,dtype=np.float64)
-    chord=[110,146.83,164.81,196]
-    for j,f in enumerate(chord):
-        mix += (.038/(1+j*.5))*np.sin(2*np.pi*f*t + .1*np.sin(t*.5))
-    mix*=np.minimum(1,t/.5)*np.minimum(1,(seconds-t)/.6)
-    for beat in np.arange(0,seconds,.50):
-        start=int(beat*sr); count=min(int(.22*sr),n-start)
-        idx=np.arange(count)/sr
-        mix[start:start+count]+=.13*np.sin(2*np.pi*(80*idx-140*idx**2))*np.exp(-idx*29)
-    elapsed=0
+    """Deterministic, original stereo score with pads, impacts and whooshes."""
+    n = int(seconds * sr)
+    t = np.arange(n, dtype=np.float64) / sr
+    rng = np.random.default_rng(20261114)
+    left = np.zeros(n, dtype=np.float64)
+    right = np.zeros(n, dtype=np.float64)
+    # Detuned, slowly modulated pads create a wide stereo bed.
+    for i, hz in enumerate((110.0, 164.81, 196.0, 261.63)):
+        slow = 0.5 + 0.5 * np.sin(2 * np.pi * (0.09 + i*.023) * t + i)
+        a = .023 * slow * np.sin(2*np.pi*hz*t)
+        b = .023 * slow * np.sin(2*np.pi*(hz*1.003)*t + .7)
+        left += a * (1.0 - i*.1)
+        right += b * (0.7 + i*.1)
+    # Deep impacts and hi-hat ticks at a steady 120 BPM.
+    for k, beat in enumerate(np.arange(0, seconds, .5)):
+        start = int(beat * sr)
+        count = min(int(.22*sr), n-start)
+        x = np.arange(count, dtype=np.float64)/sr
+        kick = .20 * np.sin(2*np.pi*(105*x - 145*x*x)) * np.exp(-x*25)
+        left[start:start+count] += kick
+        right[start:start+count] += kick*.94
+        tick_count = min(int(.06*sr), n-start)
+        noise = rng.standard_normal(tick_count)
+        tick = .016 * noise * np.exp(-np.arange(tick_count)/sr*90)
+        if k % 2:
+            left[start:start+tick_count] += tick*.5
+            right[start:start+tick_count] += tick
+        else:
+            left[start:start+tick_count] += tick
+            right[start:start+tick_count] += tick*.5
+    elapsed = 0.0
     for shot in shots:
-        start=int((elapsed+.25)*sr)
-        count=min(int(.75*sr),n-start)
-        if count>0:
-            idx=np.arange(count)/sr
-            f=330 if shot["type"]=="rooftop" else 440 if shot["type"]=="forge" else 550
-            mix[start:start+count]+=.09*np.sin(2*np.pi*(f*idx+80*idx*idx))*np.exp(-idx*4)
-        elapsed+=shot["duration"]
-    pcm=np.int16(np.clip(mix,-.95,.95)*32767)
-    with wave.open(str(dest),"wb") as out:
-        out.setnchannels(1);out.setsampwidth(2);out.setframerate(sr);out.writeframes(pcm.tobytes())
+        # A new musical impact is tied to the actual shot boundary.
+        start = int(elapsed * sr)
+        count = min(int(.8*sr), n-start)
+        if count > 0:
+            x = np.arange(count, dtype=np.float64)/sr
+            f = {'rooftop': 330, 'forge': 440, 'reveal': 550}[shot['type']]
+            chime = .085 * np.sin(2*np.pi*(f*x + 110*x*x)) * np.exp(-x*4.3)
+            left[start:start+count] += chime
+            right[start:start+count] += np.roll(chime, min(160, count-1))*.85
+        # Stereo whoosh precedes the next scene transition.
+        end = elapsed + shot['duration']
+        whoosh_start = int(max(0, end-.52)*sr)
+        count = min(int(.50*sr), n-whoosh_start)
+        if count > 0:
+            x = np.arange(count, dtype=np.float64)/sr
+            white = rng.standard_normal(count)
+            envelope = np.sin(np.pi*np.clip(x/.5, 0, 1))**2
+            sweep = .028 * white * envelope
+            left[whoosh_start:whoosh_start+count] += sweep * (1-x/.5)
+            right[whoosh_start:whoosh_start+count] += sweep * (x/.5)
+        elapsed = end
+    fade = np.minimum(1, t/.45) * np.minimum(1, (seconds-t)/.65)
+    stereo = np.stack((left*fade, right*fade), axis=1)
+    stereo = np.tanh(stereo*1.7) * .72
+    pcm = np.int16(np.clip(stereo, -.99, .99)*32767)
+    with wave.open(str(dest), 'wb') as out:
+        out.setnchannels(2)
+        out.setsampwidth(2)
+        out.setframerate(sr)
+        out.writeframes(pcm.tobytes())
 
 
 def ffprobe(path):
