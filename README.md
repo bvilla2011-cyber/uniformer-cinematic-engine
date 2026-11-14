@@ -14,6 +14,8 @@ npx hyperframes render --composition hyperframes/super_soccer.html --quality hig
 
 The composition loads GSAP from jsDelivr, so rendering it requires network access. Its timeline uses authored deterministic keyframes rather than live wall-clock motion.
 
+To render from GitHub Actions, open [the HyperFrames workflow](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/hyperframes.yml), choose **Run workflow**, select **high**, and download the resulting MP4 artifact when the run completes.
+
 ## Super Soccer teaser renderer
 
 This path creates a vertical, original low-poly-inspired football sequence: tunnel, stadium action, goal, and UniFormer/SUPER SOCCER closing frame. It renders H.264/AAC MP4 at 216p, 360p, or 1080p, with a cover frame and JSON render manifest.
