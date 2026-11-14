@@ -1,0 +1,10 @@
+{
+  "title": "Super Soccer — El partido empieza aquí",
+  "brand": "UNIFORMER STUDIO",
+  "shots": [
+    {"kind": "tunnel", "seconds": 2.7, "caption": "EL ESTADIO TE ESPERA"},
+    {"kind": "pitch",  "seconds": 3.4, "caption": "CADA JUGADA IMPORTA"},
+    {"kind": "goal",   "seconds": 3.0, "caption": "ES TU MOMENTO"},
+    {"kind": "brand",  "seconds": 2.7, "caption": "SUPER SOCCER"}
+  ]
+}

@@ -1,0 +1,61 @@
+name: Super Soccer verified cinematic render
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'super_soccer_renderer/**'
+      - 'scenes/**'
+      - 'tests/test_super_soccer_renderer.py'
+      - 'requirements-cinematic.txt'
+      - '.github/workflows/render.yml'
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      quality:
+        description: 'Resolution and speed'
+        required: true
+        default: preview
+        type: choice
+        options:
+          - smoke
+          - preview
+          - final
+
+permissions:
+  contents: read
+
+jobs:
+  test-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install -r requirements-cinematic.txt
+          ffmpeg -version | head -n 1
+      - name: Unit tests
+        run: python -m pytest -q
+      - name: Render MP4 and frame cover
+        shell: bash
+        run: |
+          QUALITY="smoke"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            QUALITY="${{ inputs.quality }}"
+          fi
+          python -m super_soccer_renderer.render --quality "$QUALITY" --story scenes/super_soccer.json --output output/super_soccer.mp4 --cover output/super_soccer_cover.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: super-soccer-video-${{ github.run_id }}
+          path: |
+            output/super_soccer.mp4
+            output/super_soccer_cover.png
+            output/super_soccer.json
+          if-no-files-found: error
+          retention-days: 14
