@@ -1,0 +1,41 @@
+name: HyperFrames cinematic render
+on:
+  workflow_dispatch:
+    inputs:
+      quality:
+        description: Render quality
+        required: true
+        default: high
+        type: choice
+        options:
+          - draft
+          - looks
+          - high
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Render the HyperFrames composition
+        run: |
+          mkdir -p output
+          npx --yes hyperframes render \
+            --composition hyperframes/super_soccer.html \
+            --quality "${{ inputs.quality }}" \
+            --fps 30 \
+            --docker \
+            --output output/super_soccer_hyperframes.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: super-soccer-hyperframes-${{ github.run_id }}
+          path: output/super_soccer_hyperframes.mp4
+          if-no-files-found: error
+          retention-days: 14
