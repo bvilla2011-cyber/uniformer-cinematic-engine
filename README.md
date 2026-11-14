@@ -70,3 +70,10 @@ These secrets are **not configured by this repository** and the FreeLLMAPI servi
 - Review every final clip for quality, rights, text legibility and platform compliance.
 
 See [architecture](docs/ARCHITECTURE.md).
+
+## 3D Super Soccer cinematic renderer
+
+A new Blender low-poly teaser pipeline adds an 18-second, portrait 1080×1920 campaign render with animated players, stadium lighting, tracked camera, original synthesized score, optional recorded narration with music ducking, and Spanish captions. It follows Super Soccer's navy, blue, purple, cyan, yellow and coral interface palette. The production workflow is on-demand and does not auto-post to social media.
+
+- [Renderer setup, audio inputs and narration](renderers/README.md)
+- [Run a preview or production render in GitHub Actions](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/blender-super-soccer.yml)
