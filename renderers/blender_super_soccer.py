@@ -575,7 +575,13 @@ def main():
         scene.render.image_settings.file_format = "PNG"
         scene.render.filepath = str(frames)
         bpy.ops.render.render(animation=True)
-        image_pattern = str(frames)+"%04d.png"
+        # Preview renders every other master-timeline frame, so Blender's
+        # filenames have gaps (0001, 0003, ...). Re-index for FFmpeg's image
+        # sequence reader while preserving their chronological order.
+        rendered_frames = sorted(Path(temp).glob("frame_*.png"))
+        for index, frame_path in enumerate(rendered_frames, start=1):
+            frame_path.rename(Path(temp) / f"sequence_{index:04d}.png")
+        image_pattern = str(Path(temp) / "sequence_%04d.png")
         # A supplied score takes precedence over the simple generated fallback.
         audio = music
         if audio is None:
