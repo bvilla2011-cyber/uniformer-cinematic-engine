@@ -509,7 +509,7 @@ def build_scene(logo=None):
     scene.frame_start = 1
     scene.frame_end = DURATION*FPS
     scene.render.engine = "BLENDER_EEVEE_NEXT" if bpy.app.version >= (4, 2, 0) else "BLENDER_EEVEE"
-    scene.eevee.taa_render_samples = 64
+    scene.eevee.taa_render_samples = 8
     scene.render.use_motion_blur = True
     scene.render.motion_blur_shutter = .22
     scene.render.resolution_percentage = 100
