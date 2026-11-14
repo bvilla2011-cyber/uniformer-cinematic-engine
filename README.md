@@ -7,6 +7,7 @@
 - Three original animated environments: rooftop character, geometric forge, floating city reveal.
 - Independently animated layers, articulated arm, particles, camera-like parallax, light effects and shot transitions.
 - Original synthesized soundtrack and effects, optional external voiceover.
+- Optional time-coded captions in project JSON and an official PNG logo overlay via `--logo assets/official_logo.png`.
 - Vertical H.264/AAC MP4 output at **540×960 or 1080×1920**, 24 FPS by default.
 - Extracted **cover frame**, **storyboard**, render report and Metricool-ready **draft metadata**.
 - Automated unit tests and visual/audio quality checks.
@@ -53,7 +54,7 @@ AI output is **strictly validated as data**. It is never executed as Python. Onl
 - No actual FreeLLMAPI account or API key has been connected.
 - No Metricool post has been scheduled. The social JSON is a **draft**.
 - Rendering uses GitHub Actions minutes and artifact storage subject to GitHub limits.
-- The official logo image has not been added to this repository. Use only authorized brand assets.
+- The official logo image has not been added to this repository; the overlay only activates when an authorized PNG is provided. Use only authorized brand assets.
 - Review every final clip for quality, rights, text legibility and platform compliance.
 
 See [architecture](docs/ARCHITECTURE.md).
