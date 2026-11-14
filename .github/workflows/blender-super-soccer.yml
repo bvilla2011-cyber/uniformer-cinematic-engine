@@ -43,7 +43,7 @@ jobs:
           VOICEOVER_PATH: ${{ inputs.voiceover_path }}
         run: |
           mkdir -p output
-          args=(--output output/super_soccer.mp4 --subtitles projects/super_soccer_launch.srt)
+          args=(--output output/super_soccer.mp4 --logo assets/official_logo.png --subtitles projects/super_soccer_launch.srt)
           if [[ "$QUALITY" == "preview" ]]; then
             args+=(--preview)
           fi
