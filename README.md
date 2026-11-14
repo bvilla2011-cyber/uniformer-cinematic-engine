@@ -48,6 +48,18 @@ python -m engine.studio --project projects/generated.json --output output/genera
 
 AI output is **strictly validated as data**. It is never executed as Python. Only three predefined scene types are supported at present.
 
+## Mobile AI-to-video workflow (optional, not yet connected)
+
+A second workflow is available: [AI creative brief → video](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/ai-creative-render.yml).
+
+Before running it, configure the following **Actions repository secrets** in GitHub **Settings → Secrets and variables → Actions**:
+
+- \`FREELLMAPI_CHAT_URL\`: full HTTPS URL of a working OpenAI-compatible chat-completions endpoint (not just a domain).
+- \`FREELLMAPI_MODEL\`: exact supported model identifier.
+- \`FREELLMAPI_API_KEY\`: provider key if required.
+
+These secrets are **not configured by this repository** and the FreeLLMAPI service contract is **not verified**. The workflow will fail with an explanatory error until configured. Once compatible, you can enter an original creative idea from your phone, validate the model's JSON output, render the approved procedural scene templates and download a ZIP. It does **not** generate photorealistic diffusion videos, create new scene types, or schedule Metricool posts automatically.
+
 ## Important limits
 
 - Procedural 2.5D is not photorealistic 3D or generative video.
