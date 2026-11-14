@@ -15,7 +15,7 @@ on:
     paths:
       - "engine/**"
       - "projects/**"
-      - "tests/**"
+      - "tests/test_studio.py"
       - "requirements.txt"
       - ".github/workflows/render.yml"
 
