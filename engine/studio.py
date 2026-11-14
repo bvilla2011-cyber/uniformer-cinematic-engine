@@ -423,9 +423,8 @@ def render(project_path,output, fps=24, width=540, preview=False, voiceover=None
     if preview:
         count=min(count,48)
         duration=count/fps
-    cover_t=min(studio.duration-.01,float(data.get("cover_at",studio.duration*.75)))
+    cover_t=min(duration-1/fps,float(data.get("cover_at",studio.duration*.75)))
     cover=output.with_name(output.stem+"_cover.png")
-    studio.render_at(cover_t).save(cover)
     sheet=Image.new("RGB",(width*len(data["shots"]),height))
     for i,shot in enumerate(data["shots"]):
         im=studio.render_at(studio.starts[i]+shot["duration"]*.55)
@@ -450,6 +449,7 @@ def render(project_path,output, fps=24, width=540, preview=False, voiceover=None
             process.kill();process.wait();raise
         if code:
             raise RuntimeError("ffmpeg failed: "+error[-3000:])
+    subprocess.run(["ffmpeg","-hide_banner","-loglevel","error","-y","-ss",str(cover_t),"-i",str(output),"-frames:v","1",str(cover)],check=True)
     probe=ffprobe(output)
     streams=probe.get("streams",[])
     assert any(s.get("codec_type")=="video" for s in streams)
