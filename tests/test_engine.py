@@ -30,3 +30,12 @@ def test_sound(tmp_path):
     path=tmp_path/"audio.wav"
     compose(path,1.2)
     assert path.stat().st_size>10000
+
+def test_ai_director_is_offline_by_default(tmp_path):
+    from cinematic_engine.director import run
+    manifest=tmp_path/"plan.json"
+    plan=run(manifest=str(manifest))
+    assert manifest.is_file()
+    assert len(plan["shots"])==4
+    assert all("World bible" in s["prompt"] for s in plan["shots"])
+    assert plan["status"]=="planned_only_no_generation"

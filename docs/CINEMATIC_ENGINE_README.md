@@ -48,3 +48,7 @@ Availability and reuse rights of FreeLLMAPI and the connected model providers mu
 This is a technical prototype, not finished AAA advertising. It still needs professional character art/rigging, visual QA, speech/lipsync, branded assets, a high-end licensed GPU video provider, consistent-character multimodal shot generation and approval before Metricool publishing. The repo does not auto-post to social media.
 
 See docs/ARCHITECTURE.md for details.
+
+## New: cinematic multi-shot AI director
+
+Plan consistent reference-based prompts without an API key using `python -m cinematic_engine.director --story scenes/super_soccer_teaser.json --output dist/shot-plan.json`. This creates a detailed JSON shot plan and **does not** call providers or use quotas. When a user-configured FreeLLMAPI endpoint is available and its commercial terms permit use, add `--generate` to request one MP4 per shot and automatically assemble them through `cinematic_engine.master`. GPU/model quality depends on the provider; no HyperFlow H3 weights are included. The AI shots are joined with intentional cuts; professional continuity and visual review remain required.

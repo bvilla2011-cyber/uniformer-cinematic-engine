@@ -21,6 +21,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: python -m pip install -r requirements-cinematic.txt
       - run: python -m pytest -q tests/test_engine.py
+      - name: Plan consistent AI shots without external model calls
+        run: python -m cinematic_engine.director --story scenes/super_soccer_teaser.json --output dist/shot-plan.json
       - name: Render animated video with original audio
         run: python -m cinematic_engine --quality smoke --story scenes/super_soccer_teaser.json --output dist/smoke.mp4 --poster dist/preview.png
       - uses: actions/upload-artifact@v4
@@ -29,6 +31,7 @@ jobs:
           path: |
             dist/smoke.mp4
             dist/preview.png
+            dist/shot-plan.json
           retention-days: 7
 
   manual-preview:
