@@ -496,7 +496,7 @@ def build_scene(logo=None):
     if logo and Path(logo).is_file():
         for f in (1,337,356,432):
             animate(logo_text,f,scale=(.001,.001,.001))
-        official_logo = image_panel(logo,cam,(0,.65,-3.40),.39)
+        official_logo = image_panel(logo,cam,(0,1.02,-3.40),.68)
         for f, s in ((1,(.001,.001,.001)),(337,(.001,.001,.001)),(356,(1,1,1)),(432,(1,1,1))):
             animate(official_logo,f,scale=s)
     # Keep the title lockup clear; decorative ring crossed the tagline in portrait framing.
@@ -538,13 +538,16 @@ def main():
     voice = Path(opt.voiceover).resolve() if opt.voiceover else None
     music = Path(opt.music).resolve() if opt.music else None
     subtitles = Path(opt.subtitles).resolve() if opt.subtitles else None
+    logo = Path(opt.logo).resolve() if opt.logo else Path(__file__).resolve().parent.parent / "assets" / "official_logo.png"
     if voice and not voice.is_file():
         raise FileNotFoundError(f"Voiceover not found: {voice}")
     if music and not music.is_file():
         raise FileNotFoundError(f"Music not found: {music}")
     if subtitles and not subtitles.is_file():
         raise FileNotFoundError(f"Subtitles not found: {subtitles}")
-    cam = build_scene(opt.logo)
+    if opt.logo and not logo.is_file():
+        raise FileNotFoundError(f"Logo not found: {logo}")
+    cam = build_scene(str(logo) if logo.is_file() else None)
     scene = bpy.context.scene
     fps = 12 if opt.preview else FPS
     width = 360 if opt.preview else 1080
@@ -593,6 +596,10 @@ def main():
                 "-map","0:v:0","-map","[aout]"]
         else:
             ffmpeg += ["-map","0:v:0","-map","1:a:0"]
+        if subtitles:
+            subtitle_path = str(subtitles).replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
+            style = "FontName=DejaVu Sans,Bold=1,FontSize=48,PrimaryColour=&H00FFFFFF,OutlineColour=&H99081020,BorderStyle=1,Outline=4,Shadow=1,Alignment=2,MarginV=84"
+            ffmpeg += ["-vf", f"subtitles='{subtitle_path}':force_style='{style}'"]
         ffmpeg += ["-c:v","libx264","-preset","slow" if not opt.preview else "veryfast","-crf","16" if not opt.preview else "25","-pix_fmt","yuv420p","-r",str(fps),"-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(out)]
         subprocess.run(ffmpeg,check=True)
     if subtitles:
