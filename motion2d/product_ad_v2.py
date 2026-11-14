@@ -116,7 +116,7 @@ def main():
   fade=np.minimum(1,np.maximum(0,(total-sample)/.65));music*=fade;fx*=fade
   for name,data in [('music',music),('effects',fx)]:
    with wave.open(str(tmp/f'{name}.wav'),'wb') as f:f.setnchannels(1);f.setsampwidth(2);f.setframerate(rate);f.writeframes((np.clip(data,-1,1)*32767).astype('<i2').tobytes())
-  subprocess.run(['ffmpeg','-v','error','-y','-i',str(raw),'-i',str(narration),'-i',str(tmp/'music.wav'),'-i',str(tmp/'effects.wav'),'-filter_complex','[1:a]loudnorm=I=-16:TP=-2:LRA=8,asplit=2[v][side];[2:a][side]sidechaincompress=threshold=0.025:ratio=5:attack=15:release=220[m];[v][m][3:a]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.89[a]','-map','0:v','-map','[a]','-t',str(total),'-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart',str(a.output)],check=True)
+  subprocess.run(['ffmpeg','-v','error','-y','-i',str(raw),'-i',str(narration),'-i',str(tmp/'music.wav'),'-i',str(tmp/'effects.wav'),'-filter_complex','[1:a]loudnorm=I=-16:TP=-2:LRA=8,asplit=2[v][side];[2:a][side]sidechaincompress=threshold=0.025:ratio=5:attack=15:release=220[m];[v][m][3:a]amix=inputs=3:duration=longest:normalize=0,alimiter=limit=0.79:level=false[a]','-map','0:v','-map','[a]','-t',str(total),'-c:v','copy','-c:a','aac','-b:a','192k','-movflags','+faststart',str(a.output)],check=True)
  a.output.with_suffix('.timing.json').write_text(json.dumps({'duration':total,'scenes':[{'start':st,'duration':d,'layout':kind,'narration':txt} for st,d,(kind,txt) in zip(starts,lengths,scenes)]},ensure_ascii=False,indent=2))
  print(a.output)
 if __name__=='__main__':main()
