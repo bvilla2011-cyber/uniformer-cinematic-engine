@@ -1,13 +1,59 @@
 # UniFormer Cinematic Engine
 
-Production toolkit for original, procedural 2.5D promotional clips for UniFormer Studio.
+**Experimental procedural animation studio** for UniFormer Studio. Produces original 2.5D short-form promotional clips from a structured JSON brief. This is a **working technical prototype**, not yet an AAA-quality cinematic tool or a replacement for professional animators.
 
-**Status:** experimental animation prototype. Not an AAA renderer; the first milestone is a reproducible short MP4 with independently animated scene elements, camera movement, original synthesized audio, and a GitHub Actions render workflow.
+## What works now
 
-The engine never executes Python written by a language model. Text models can propose structured creative briefs; the renderer uses trusted, version-controlled animation code.
+- Three original animated environments: rooftop character, geometric forge, floating city reveal.
+- Independently animated layers, articulated arm, particles, camera-like parallax, light effects and shot transitions.
+- Original synthesized soundtrack and effects, optional external voiceover.
+- Vertical H.264/AAC MP4 output at **540×960 or 1080×1920**, 24 FPS by default.
+- Extracted **cover frame**, **storyboard**, render report and Metricool-ready **draft metadata**.
+- Automated unit tests and visual/audio quality checks.
+- GitHub Actions workflow producing a downloadable production package.
+- Optional **OpenAI-compatible** text-model creative brief adapter. FreeLLMAPI compatibility and credentials **not yet verified**; no automatic posting.
 
-See the documentation and GitHub Actions workflow added in the next commit.
+## Render on GitHub (iPhone-friendly)
 
-## Enhanced multi-shot cinematic pipeline
+1. Open [GitHub Actions](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/render.yml).
+2. Tap **Run workflow** and choose 1080 for full-HD vertical output.
+3. Wait for the workflow to complete successfully.
+4. Open the run and download the **uniformer-first-light-production** artifact ZIP.
 
-A separate experimental module has been added in **cinematic_engine/** with four animated football scenes, original sound, safe JSON storyboards, and optional FreeLLMAPI API adapters. See [cinematic engine guide](docs/CINEMATIC_ENGINE_README.md). Its dedicated workflow is **UniFormer Cinematic Engine**. The existing engine/render.py and its workflow remain available.
+The workflow also runs automatically when engine, project or test files change.
+
+## Local development
+
+Requires Python 3.11+ and FFmpeg (including ffprobe).
+
+\`\`\`bash
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python -m engine.studio --project projects/first_light.json --width 1080 --output output/first_light.mp4
+python -m engine.qa output/first_light.mp4 --min-width 1080
+python -m engine.social --project projects/first_light.json --video output/first_light.mp4
+\`\`\`
+
+For a fast smoke test use \`--width 270 --preview\`.
+
+## AI-assisted brief generation (optional)
+
+\`engine/brief.py\` can call an **OpenAI-compatible chat-completions endpoint**. This is an adapter, not a verified FreeLLMAPI integration. Configure **FREELLMAPI_CHAT_URL**, **FREELLMAPI_MODEL**, and optionally **FREELLMAPI_API_KEY** as private environment variables; never commit credentials.
+
+\`\`\`bash
+python -m engine.brief --idea "An original 10-second UniFormer teaser" --output projects/generated.json
+python -m engine.studio --project projects/generated.json --output output/generated.mp4
+\`\`\`
+
+AI output is **strictly validated as data**. It is never executed as Python. Only three predefined scene types are supported at present.
+
+## Important limits
+
+- Procedural 2.5D is not photorealistic 3D or generative video.
+- No actual FreeLLMAPI account or API key has been connected.
+- No Metricool post has been scheduled. The social JSON is a **draft**.
+- Rendering uses GitHub Actions minutes and artifact storage subject to GitHub limits.
+- The official logo image has not been added to this repository. Use only authorized brand assets.
+- Review every final clip for quality, rights, text legibility and platform compliance.
+
+See [architecture](docs/ARCHITECTURE.md).
