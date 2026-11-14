@@ -1,0 +1,36 @@
+name: Super Soccer product advertisement
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: bvilla2011-cyber/Super-Soccer
+          ref: 0bf7469a82fd63ae499492407a939bc327b12cdc
+          path: game-source
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - run: python -m pip install Pillow numpy edge-tts
+      - run: npm install --no-save @napi-rs/canvas
+      - run: node motion2d/capture_game.cjs game-source output/gameframes
+      - run: ffmpeg -v error -y -framerate 30 -i output/gameframes/%05d.png -c:v libx264 -crf 18 -pix_fmt yuv420p output/gameplay.mp4
+      - run: python motion2d/product_ad_v2.py --gameplay output/gameplay.mp4 --logo assets/official_logo.png --output output/super_soccer_ad.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: super-soccer-product-ad
+          path: |
+            output/super_soccer_ad.mp4
+            output/gameframes/capture.json
+            output/super_soccer_ad.timing.json
+          if-no-files-found: error
