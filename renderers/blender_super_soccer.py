@@ -256,6 +256,8 @@ def image_panel(path, parent, loc, height):
     material.use_nodes = True
     if hasattr(material, "surface_render_method"):
         material.surface_render_method = "DITHERED"
+    elif hasattr(material, "blend_method"):
+        material.blend_method = "BLEND"
     nodes = material.node_tree.nodes
     shader = nodes.get("Principled BSDF")
     texture = nodes.new("ShaderNodeTexImage")
