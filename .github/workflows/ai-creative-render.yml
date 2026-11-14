@@ -1,0 +1,71 @@
+name: AI creative brief → video (requires private API configuration)
+
+on:
+  workflow_dispatch:
+    inputs:
+      idea:
+        description: "Describe your original UniFormer ad (no copyrighted characters)"
+        required: true
+        type: string
+      resolution:
+        description: "Video width"
+        type: choice
+        required: true
+        default: "1080"
+        options:
+          - "540"
+          - "1080"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-render-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  create-and-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FREELLMAPI_CHAT_URL: ${{ secrets.FREELLMAPI_CHAT_URL }}
+      FREELLMAPI_MODEL: ${{ secrets.FREELLMAPI_MODEL }}
+      FREELLMAPI_API_KEY: ${{ secrets.FREELLMAPI_API_KEY }}
+      IDEA: ${{ inputs.idea }}
+      WIDTH: ${{ inputs.resolution }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Check private API configuration
+        run: |
+          if [ -z "$FREELLMAPI_CHAT_URL" ] || [ -z "$FREELLMAPI_MODEL" ]; then
+            echo "::error::Configure FREELLMAPI_CHAT_URL and FREELLMAPI_MODEL in GitHub Actions secrets before running."
+            exit 1
+          fi
+      - name: Install renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+      - name: Validate renderer tests
+        run: python -m unittest discover -s tests -p 'test_studio.py' -v
+      - name: Ask configured text model for a safe creative brief
+        run: python -m engine.brief --idea "$IDEA" --output projects/ai_generated.json
+      - name: Render approved scene templates
+        run: python -m engine.studio --project projects/ai_generated.json --width "$WIDTH" --output output/ai_generated.mp4
+      - name: Validate media
+        run: python -m engine.qa output/ai_generated.mp4 --min-width "$WIDTH"
+      - name: Prepare publishing draft
+        run: python -m engine.social --project projects/ai_generated.json --video output/ai_generated.mp4
+      - name: Save video, cover, storyboard and creative brief
+        uses: actions/upload-artifact@v4
+        with:
+          name: uniformer-ai-creative-production
+          path: |
+            output/
+            projects/ai_generated.json
+          retention-days: 7
+          if-no-files-found: error
