@@ -1,59 +1,45 @@
 # UniFormer Cinematic Engine
 
-**Experimental procedural animation studio** for UniFormer Studio. Produces original 2.5D short-form promotional clips from a structured JSON brief. This is a **working technical prototype**, not yet an AAA-quality cinematic tool or a replacement for professional animators.
+Procedural 2.5D animation tools for original UniFormer Studio campaign clips. The repository contains two render paths: the general scene studio under `engine/` and the football teaser renderer under `super_soccer_renderer/`.
 
-## What works now
+## Super Soccer teaser renderer
 
-- Three original animated environments: rooftop character, geometric forge, floating city reveal.
-- Independently animated layers, articulated arm, particles, camera-like parallax, light effects and shot transitions.
-- Original synthesized soundtrack and effects, optional external voiceover.
-- Vertical H.264/AAC MP4 output at **540×960 or 1080×1920**, 24 FPS by default.
-- Extracted **cover frame**, **storyboard**, render report and Metricool-ready **draft metadata**.
-- Automated unit tests and visual/audio quality checks.
-- GitHub Actions workflow producing a downloadable production package.
-- Optional **OpenAI-compatible** text-model creative brief adapter. FreeLLMAPI compatibility and credentials **not yet verified**; no automatic posting.
+This path creates a vertical, original low-poly-inspired football sequence: tunnel, stadium action, goal, and UniFormer/SUPER SOCCER closing frame. It renders H.264/AAC MP4 at 216p, 360p, or 1080p, with a cover frame and JSON render manifest.
 
-## Render on GitHub (iPhone-friendly)
+The renderer supports an optional original voiceover and timed SRT sidecar. The narration remains at its chosen gain; the soundtrack defaults to 30% and is ducked automatically while speech is present. A restrained contrast, saturation, gamma, and vignette grade is applied to the final video. The logo is optional and must be an authorized transparent PNG.
 
-1. Open [GitHub Actions](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/render.yml).
-2. Tap **Run workflow** and choose 1080 for full-HD vertical output.
-3. Wait for the workflow to complete successfully.
-4. Open the run and download the **uniformer-first-light-production** artifact ZIP.
+### Render with voice and captions
 
-The workflow also runs automatically when engine, project or test files change.
+```bash
+python -m pip install -r requirements-cinematic.txt
+python -m super_soccer_renderer.render \
+  --story scenes/super_soccer.json \
+  --quality final \
+  --voiceover assets/narration.wav \
+  --subtitles assets/narration.srt \
+  --logo assets/uniformer-logo.png \
+  --output output/super_soccer.mp4
+```
 
-## Local development
+The MP4 is accompanied by `output/super_soccer.json`, the selected cover frame, and—when supplied—`output/super_soccer.srt`. Use `--voice-gain` and `--music-gain` to adjust the mix. Voice gain accepts 0–2; music gain accepts 0–1.
 
-Requires Python 3.11+ and FFmpeg (including ffprobe).
+### Render on GitHub
 
-\`\`\`bash
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
-python -m engine.studio --project projects/first_light.json --width 1080 --output output/first_light.mp4
-python -m engine.qa output/first_light.mp4 --min-width 1080
-python -m engine.social --project projects/first_light.json --video output/first_light.mp4
-\`\`\`
+Open [the Super Soccer render workflow](https://github.com/bvilla2011-cyber/uniformer-cinematic-engine/actions/workflows/super_soccer.yml), run it, and select a quality profile. The workflow produces a downloadable artifact. It does not receive a private narration or logo automatically; those files must be supplied to a local render or added through an approved private asset workflow.
 
-For a fast smoke test use \`--width 270 --preview\`.
+## General scene studio
 
-## AI-assisted brief generation (optional)
+The separate `engine/` renderer supports rooftop, geometric forge, and floating city scenes from JSON briefs. Its usage and AI-assisted brief adapter are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). FreeLLMAPI compatibility and credentials have not been verified, and no social posts are scheduled automatically.
 
-\`engine/brief.py\` can call an **OpenAI-compatible chat-completions endpoint**. This is an adapter, not a verified FreeLLMAPI integration. Configure **FREELLMAPI_CHAT_URL**, **FREELLMAPI_MODEL**, and optionally **FREELLMAPI_API_KEY** as private environment variables; never commit credentials.
+## Development
 
-\`\`\`bash
-python -m engine.brief --idea "An original 10-second UniFormer teaser" --output projects/generated.json
-python -m engine.studio --project projects/generated.json --output output/generated.mp4
-\`\`\`
+Requires Python 3.11+ and FFmpeg. Dependencies are listed in `requirements-cinematic.txt` for the Super Soccer renderer and `requirements.txt` for the general studio.
 
-AI output is **strictly validated as data**. It is never executed as Python. Only three predefined scene types are supported at present.
+```bash
+python -m pytest -q
+python -m super_soccer_renderer.render --quality smoke --output output/preview.mp4
+```
 
-## Important limits
+## Current production boundary
 
-- Procedural 2.5D is not photorealistic 3D or generative video.
-- No actual FreeLLMAPI account or API key has been connected.
-- No Metricool post has been scheduled. The social JSON is a **draft**.
-- Rendering uses GitHub Actions minutes and artifact storage subject to GitHub limits.
-- The official logo image has not been added to this repository. Use only authorized brand assets.
-- Review every final clip for quality, rights, text legibility and platform compliance.
-
-See [architecture](docs/ARCHITECTURE.md).
+The footage is deterministic, hand-authored procedural 2.5D built from vector shapes and animated layers. It is not a full 3D character animation pipeline or generative video, and it cannot guarantee a specific commercial/AAA result by itself. For a campaign deliverable, inspect the actual render, keep narration timing aligned to the storyboard, and provide authorized logo/audio assets. The new voice mix, color grade, cover frame and SRT sidecar are production controls; they do not replace final human review.
