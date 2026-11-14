@@ -4,3 +4,8 @@ dist/
 __pycache__/
 .pytest_cache/
 .env
+*.py[cod]
+.venv/
+output/
+.env.*
+.DS_Store
