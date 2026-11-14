@@ -53,6 +53,17 @@ def validate_project(data):
                 raise ValueError(f"shots[{i}].{field} must be <= 70 characters")
     if duration > MAX_DURATION:
         raise ValueError("Project exceeds 60 seconds")
+    captions = data.get("captions", [])
+    if not isinstance(captions, list) or len(captions) > 150:
+        raise ValueError("captions must be a list of at most 150 items")
+    for item in captions:
+        if not isinstance(item, dict) or not isinstance(item.get("text"), str) or len(item["text"]) > 80:
+            raise ValueError("Invalid caption text")
+        start, end = item.get("start"), item.get("end")
+        if (not isinstance(start, (int, float)) or not isinstance(end, (int, float))
+                or not math.isfinite(start) or not math.isfinite(end)
+                or not 0 <= start < end <= duration):
+            raise ValueError("Invalid caption timing")
     return duration
 
 
@@ -68,7 +79,7 @@ def get_font(size, bold=True):
 
 
 class Studio:
-    def __init__(self, project, width=BASE_W, height=BASE_H):
+    def __init__(self, project, width=BASE_W, height=BASE_H, logo_path=None):
         self.project = project
         self.duration = validate_project(project)
         self.width, self.height = width, height
@@ -78,6 +89,10 @@ class Studio:
         self.starts = np.cumsum([0] + [s["duration"] for s in project["shots"]]).tolist()
         self.gradients = {}
         self.glows = {}
+        self.logo = None
+        if logo_path:
+            self.logo = Image.open(logo_path).convert("RGBA")
+            self.logo.thumbnail(self.pt(210, 210), Image.Resampling.LANCZOS)
 
     def font(self, n, bold=True):
         return get_font(max(8, round(n*self.scale)), bold)
@@ -303,6 +318,25 @@ class Studio:
             nextshot=self.project["shots"][i+1]
             other=methods[nextshot["type"]](0,nextshot["duration"],nextshot)
             im=Image.blend(im,other,a)
+        if self.logo is not None and i == len(self.project["shots"]) - 1:
+            alpha = smooth((local - .7) / .65)
+            if alpha:
+                logo = self.logo.copy()
+                logo.putalpha(logo.getchannel("A").point(lambda v: round(v * alpha)))
+                im.alpha_composite(logo, (round((self.width - logo.width) / 2), self.pt(0, 620)[1]))
+        for caption in self.project.get("captions", []):
+            if caption["start"] <= t < caption["end"]:
+                d = ImageDraw.Draw(im, "RGBA")
+                caption_font = self.font(27)
+                txt = caption["text"].upper()
+                box = d.textbbox((0, 0), txt, font=caption_font)
+                tw = box[2] - box[0]
+                x, y = self.pt(270, 847)
+                pad = round(17 * self.scale)
+                d.rounded_rectangle((x-tw/2-pad, y-pad, x+tw/2+pad, y+round(43*self.scale)),
+                                    radius=round(12*self.scale), fill=(4, 14, 30, 205))
+                d.text((x, y), txt, font=caption_font, anchor="mt", fill=(255, 255, 255, 255))
+                break
         return im.convert("RGB")
 
 
@@ -338,10 +372,10 @@ def ffprobe(path):
     return json.loads(out.stdout)
 
 
-def render(project_path,output, fps=24, width=540, preview=False, voiceover=None):
+def render(project_path,output, fps=24, width=540, preview=False, voiceover=None, logo=None):
     data=json.loads(Path(project_path).read_text(encoding="utf-8"))
     height=round(width*16/9)
-    studio=Studio(data,width,height)
+    studio=Studio(data,width,height,logo_path=logo)
     output=Path(output)
     output.parent.mkdir(parents=True,exist_ok=True)
     if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
@@ -397,8 +431,9 @@ def main():
     p.add_argument("--fps",type=int,default=24,choices=[12,24,30])
     p.add_argument("--preview",action="store_true")
     p.add_argument("--voiceover",type=Path)
+    p.add_argument("--logo",type=Path,help="Optional official logo PNG with transparency")
     args=p.parse_args()
-    print(json.dumps(render(args.project,args.output,args.fps,args.width,args.preview,args.voiceover),indent=2))
+    print(json.dumps(render(args.project,args.output,args.fps,args.width,args.preview,args.voiceover,args.logo),indent=2))
 
 
 if __name__=="__main__":
