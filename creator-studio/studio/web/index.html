@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0f17">
+  <title>Creator Studio — UniFormer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-symbol"><span>◢</span></div><div><div class="brand-title">UNIFORMER <span>STUDIO</span></div><div class="brand-sub">CREATOR OS / ALPHA</div></div></div>
+    <div class="workspace-label">WORKSPACE <span>01</span></div>
+    <nav id="mainNav">
+      <button class="nav-item active" data-page="studio"><span class="nav-ico">▦</span>Estudio creativo<span class="nav-arrow">›</span></button>
+      <button class="nav-item" data-page="projects"><span class="nav-ico">▤</span>Proyectos</button>
+      <button class="nav-item" data-page="stock"><span class="nav-ico">◈</span>Biblioteca visual</button>
+      <button class="nav-item" data-page="exports"><span class="nav-ico">⇩</span>Exportaciones</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="integration"><span id="aiLed" class="led"></span><div><b>Motor creativo IA</b><small id="aiState">Comprobando...</small></div></div><div class="integration"><span id="renderLed" class="led"></span><div><b>Render FFmpeg</b><small id="renderState">Comprobando...</small></div></div><div class="sidebar-credit">PROTOTIPO LOCAL · v0.1.0<br>Sin publicación automática</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb">WORKSPACE <span>/</span> <strong id="breadcrumb">Estudio creativo</strong></div><div class="right"><span class="edition">● ALPHA BUILD</span><button class="small-outline" id="newProjectTop">+ Nuevo proyecto</button><div class="avatar">U</div></div></header>
+    <div id="appContent"></div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/app.js"></script>
+</body>
+</html>
